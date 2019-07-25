@@ -49,7 +49,7 @@ n_features = len(feature_names)
 def draw_sample_validation(X, Ri, Ro, y, 
                 cmap='bwr_r', 
                 skip_false_edges=True,
-                alpha_labels=False, 
+                alpha_labels=True, 
                 sim_list=None,
                 particular_simcluster_list=None,
                 itsn=None): 
@@ -66,9 +66,9 @@ def draw_sample_validation(X, Ri, Ro, y,
     for j in range(y.shape[0]):
         if not y[j] and skip_false_edges: continue
         if alpha_labels:
-            seg_args = dict(c='k', alpha=float(y[j]))
+            seg_args = dict(c='b', alpha=0.3)
         else:
-            seg_args = dict(c=cmap(float(y[j])))
+            seg_args = dict(c='b')
         ax0.plot([feats_o[j,0], feats_i[j,0]],
                  [feats_o[j,2], feats_i[j,2]], '-', **seg_args)
         ax1.plot([feats_o[j,1], feats_i[j,1]],

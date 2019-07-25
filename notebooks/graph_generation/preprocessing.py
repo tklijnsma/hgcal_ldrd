@@ -39,7 +39,7 @@ def make_graph_kdtree(coords,layers,sim_indices,r):
 def make_graph_knn(coords, layers, sim_indices, k):
     
     nbrs = NearestNeighbors(algorithm='kd_tree').fit(coords)
-    pairs = np.array(nbrs.kneighbors_graph(coords, 5).nonzero()).T
+    pairs = np.array(nbrs.kneighbors_graph(coords, k).nonzero()).T
     first,second = pairs[:,0],pairs[:,1]  
     #selected index pair list that we label as connected
     pairs_sel  = pairs[(first != second)]
@@ -98,6 +98,6 @@ def make_graph_etaphi(arrays, valid_sim_indices, ievt, mask, r, layered_norm, al
     simmatched = np.where(sim_hits_mask[mask])[0]
     
     #Ri, Ro, y_label = make_graph_kdtree(np.stack((eta, phi, layer_normed)).T, layer, simmatched, r=r)
-    Ri, Ro, y_label = algo(np.stack((eta, phi, layer_normed)).T, layer, simmatched, k=3)
+    Ri, Ro, y_label = algo(np.stack((eta, phi, layer_normed)).T, layer, simmatched, k=5)
     
     return Graph(feats, Ri, Ro, y_label, simmatched)
