@@ -45,12 +45,12 @@ def make_graph_knn(coords, layers, sim_indices, k):
     nbrs_sm.eliminate_zeros() 
     nbrs_sm = nbrs_sm + nbrs_sm.T
     pairs_sel = np.array(nbrs_sm.nonzero()).T
-    first,second = pairs[:,0],pairs[:,1]  
+    first,second = pairs_sel[:,0],pairs_sel[:,1]  
     #selected index pair list that we label as connected
     data_sel = np.ones(pairs_sel.shape[0])
     
     #prepare the input and output matrices (already need to store sparse)
-    r_shape = (coords.shape[0],pairs.shape[0])
+    r_shape = (coords.shape[0],pairs_sel.shape[0])
     eye_edges = np.arange(pairs_sel.shape[0])
     
     R_i = csr_matrix((data_sel,(pairs_sel[:,1],eye_edges)),r_shape,dtype=np.uint8)
@@ -62,7 +62,7 @@ def make_graph_knn(coords, layers, sim_indices, k):
         
 
 
-def make_graph_xy(arrays, valid_sim_indices, ievt, mask, algo, preprocessing_args):
+def make_graph_xy(arrays, valid_sim_indices, ievt, mask, layered_norm, algo, preprocessing_args):
    
     x = arrays[b'rechit_x'][ievt][mask]
     y = arrays[b'rechit_y'][ievt][mask]
