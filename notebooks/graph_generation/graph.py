@@ -63,7 +63,7 @@ def draw_sample_validation(X, Ri, Ro, y,
 
     
     # Draw the segments
-    for j in range(y.shape[0]):
+    for j in tqdm.tqdm(range(y.shape[0])):
         if not y[j] and skip_false_edges: continue
         if alpha_labels:
             seg_args = dict(c='b', alpha=0.3)

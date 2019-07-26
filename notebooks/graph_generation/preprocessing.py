@@ -15,6 +15,7 @@ def make_graph_kdtree(coords,layers,sim_indices,r):
     #and build a sparse matrix representation, then blow it up 
     #to the full R_in / R_out definiton
     pairs = the_tree.query_pairs(r=r,output_type='ndarray')
+    pairs = pairs[np.argsort(pairs[:,0])]
     first,second = pairs[:,0],pairs[:,1]  
     #selected index pair list that we label as connected
     #pairs_sel  = pairs[( (np.abs(layers[(second,)]-layers[(first,)]) <= 1)  )]
@@ -39,10 +40,13 @@ def make_graph_kdtree(coords,layers,sim_indices,r):
 def make_graph_knn(coords, layers, sim_indices, k):
     
     nbrs = NearestNeighbors(algorithm='kd_tree').fit(coords)
-    pairs = np.array(nbrs.kneighbors_graph(coords, k).nonzero()).T
+    nbrs_sm = nbrs.kneighbors_graph(coords, k)
+    nbrs_sm.setdiag(0) #remove self-loop edges
+    nbrs_sm.eliminate_zeros() 
+    nbrs_sm = nbrs_sm + nbrs_sm.T
+    pairs_sel = np.array(nbrs_sm.nonzero()).T
     first,second = pairs[:,0],pairs[:,1]  
     #selected index pair list that we label as connected
-    pairs_sel  = pairs[(first != second)]
     data_sel = np.ones(pairs_sel.shape[0])
     
     #prepare the input and output matrices (already need to store sparse)
@@ -58,7 +62,7 @@ def make_graph_knn(coords, layers, sim_indices, k):
         
 
 
-def make_graph_xy(arrays, valid_sim_indices, ievt, mask, r, algo=make_graph_knn):
+def make_graph_xy(arrays, valid_sim_indices, ievt, mask, algo, preprocessing_args):
    
     x = arrays[b'rechit_x'][ievt][mask]
     y = arrays[b'rechit_y'][ievt][mask]
@@ -74,11 +78,11 @@ def make_graph_xy(arrays, valid_sim_indices, ievt, mask, r, algo=make_graph_knn)
     sim_hits_mask[all_sim_hits] = True
     simmatched = np.where(sim_hits_mask[mask])[0]
     
-    Ri, Ro, y_label = algo(np.stack((x,y,layer)).T, layer, simmatched, r=r)
+    Ri, Ro, y_label = algo(np.stack((x,y,layer)).T, layer, simmatched, **preprocessing_args)
     
     return Graph(feats, Ri, Ro, y_label, simmatched)
 
-def make_graph_etaphi(arrays, valid_sim_indices, ievt, mask, r, layered_norm, algo=make_graph_knn):
+def make_graph_etaphi(arrays, valid_sim_indices, ievt, mask, layered_norm, algo, preprocessing_args):
    
     x = arrays[b'rechit_x'][ievt][mask]
     y = arrays[b'rechit_y'][ievt][mask]
@@ -98,6 +102,6 @@ def make_graph_etaphi(arrays, valid_sim_indices, ievt, mask, r, layered_norm, al
     simmatched = np.where(sim_hits_mask[mask])[0]
     
     #Ri, Ro, y_label = make_graph_kdtree(np.stack((eta, phi, layer_normed)).T, layer, simmatched, r=r)
-    Ri, Ro, y_label = algo(np.stack((eta, phi, layer_normed)).T, layer, simmatched, k=5)
+    Ri, Ro, y_label = algo(np.stack((eta, phi, layer_normed)).T, layer, simmatched, **preprocessing_args)
     
     return Graph(feats, Ri, Ro, y_label, simmatched)
