@@ -10,4 +10,5 @@ conda install pandas matplotlib jupyter nbconvert==5.4.1
 conda install -c conda-forge tqdm
 pip install uproot scipy sklearn --user
 pip install torch-scatter torch-sparse
+pip install networkx
 ```
