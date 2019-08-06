@@ -53,34 +53,39 @@ def draw_sample_validation(X, Ri, Ro, y,
                 sim_list=None,
                 particular_simcluster_list=None,
                 itsn=None): 
-    # Select the i/o node features for each segment    
-    feats_o = X[find(Ro)[0]]
-    feats_i = X[find(Ri)[0]]    
+    
     # Prepare the figure
     fig, (ax0,ax1) = plt.subplots(1, 2, figsize=(20,12))
     cmap = plt.get_cmap(cmap)
     
+    if ((len(Ri) != 0) and (len(Ro) != 0)):
+        # Select the i/o node features for each segment    
+        feats_o = X[find(Ro)[0]]
+        feats_i = X[find(Ri)[0]]    
 
-    
-    # Draw the segments
-    for j in tqdm.tqdm(range(y.shape[0])):
-        if not y[j] and skip_false_edges: continue
-        if alpha_labels:
-            seg_args = dict(c='b', alpha=0.3)
-        else:
-            seg_args = dict(c='b')
-        ax0.plot([feats_o[j,0], feats_i[j,0]],
-                 [feats_o[j,2], feats_i[j,2]], '-', **seg_args)
-        ax1.plot([feats_o[j,1], feats_i[j,1]],
-                 [feats_o[j,2], feats_i[j,2]], '-', **seg_args)
+
+
+
+        # Draw the segments
+        for j in tqdm.tqdm(range(y.shape[0])):
+            if not y[j] and skip_false_edges: continue
+            if alpha_labels:
+                seg_args = dict(c='b', alpha=0.3)
+            else:
+                seg_args = dict(c='b')
+            ax0.plot([feats_o[j,0], feats_i[j,0]],
+                     [feats_o[j,2], feats_i[j,2]], '-', **seg_args)
+            ax1.plot([feats_o[j,1], feats_i[j,1]],
+                     [feats_o[j,2], feats_i[j,2]], '-', **seg_args)
         
     if sim_list is None:    
         # Draw the hits (layer, x, y)
         ax0.scatter(X[:,0], X[:,2], c='k')
         ax1.scatter(X[:,1], X[:,2], c='k')
-    else:        
-        #ax0.scatter(X[:,0], X[:,2], c='k')
-        #ax1.scatter(X[:,1], X[:,2], c='k')
+    else:
+        if ((len(Ri) == 0) and (len(Ro) == 0)):
+            ax0.scatter(X[:,0], X[:,2], c='k', alpha=0.3)
+            ax1.scatter(X[:,1], X[:,2], c='k', alpha=0.3)
         ax0.scatter(X[sim_list,0], X[sim_list,2], c='g')
         ax1.scatter(X[sim_list,1], X[sim_list,2], c='g')
         
