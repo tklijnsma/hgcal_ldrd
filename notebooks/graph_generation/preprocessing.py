@@ -113,7 +113,7 @@ def make_graph_noedge(arrays, valid_sim_indices, ievt, mask):
     layer = arrays[b'rechit_layer'][ievt][mask]
     time = arrays[b'rechit_time'][ievt][mask]
     energy = arrays[b'rechit_energy'][ievt][mask]    
-    feats = np.stack((x,y,layer,time,energy)).T
+    feats = np.stack((x,y,z,layer,time,energy)).T
     
     all_sim_hits = np.unique(valid_sim_indices[ievt].flatten())
     sim_hits_mask = np.zeros(arrays[b'rechit_z'][ievt].size)

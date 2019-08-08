@@ -58,27 +58,35 @@ class FPModule(torch.nn.Module):
 class PointNet(torch.nn.Module):
     def __init__(self, num_classes):
         super(PointNet, self).__init__()
-        self.sa1_module = SAModule(0.2, 0.2, MLP([8, 64, 64, 128]))
-        self.sa2_module = SAModule(0.25, 0.4, MLP([128 + 3, 128, 128, 256]))
-        self.sa3_module = GlobalSAModule(MLP([256 + 3, 256, 512, 1024]))
+        #self.sa1_module = SAModule(0.2, 0.2, MLP([8, 64, 64, 128]))
+        self.sa1_module = SAModule(0.4, 1.6, MLP([9, 32, 32, 64]))
+        #self.sa2_module = SAModule(0.25, 0.4, MLP([128 + 3, 128, 128, 256]))
+        self.sa2_module = SAModule(0.4, 3.5, MLP([64 + 3, 64, 64, 128]))
+        
+        self.sa3_module = SAModule(0.4, 10.0, MLP([128 + 3, 128, 128, 256]))
+        
+        self.sa4_module = GlobalSAModule(MLP([256 + 3, 256, 512, 1024]))
 
         self.fp3_module = FPModule(1, MLP([1024 + 256, 256, 256]))
         self.fp2_module = FPModule(3, MLP([256 + 128, 256, 128]))
-        self.fp1_module = FPModule(3, MLP([128 + 5, 128, 128, 128]))
+        self.fp1_module = FPModule(3, MLP([128 + 64, 128, 64]))
+        self.fp0_module = FPModule(3, MLP([64 + 6, 64, 64, 64]))
 
-        self.lin1 = torch.nn.Linear(128, 128)
-        self.lin2 = torch.nn.Linear(128, 128)
-        self.lin3 = torch.nn.Linear(128, num_classes)
+        self.lin1 = torch.nn.Linear(64, 64)
+        self.lin2 = torch.nn.Linear(64, 64)
+        self.lin3 = torch.nn.Linear(64, num_classes)
 
     def forward(self, data):
         sa0_out = (data.x, data.pos, data.batch)
         sa1_out = self.sa1_module(*sa0_out)
         sa2_out = self.sa2_module(*sa1_out)
         sa3_out = self.sa3_module(*sa2_out)
+        sa4_out = self.sa4_module(*sa3_out)
 
-        fp3_out = self.fp3_module(*sa3_out, *sa2_out)
-        fp2_out = self.fp2_module(*fp3_out, *sa1_out)
-        x, _, _ = self.fp1_module(*fp2_out, *sa0_out)
+        fp3_out = self.fp3_module(*sa4_out, *sa3_out)
+        fp2_out = self.fp2_module(*fp3_out, *sa2_out)
+        fp1_out = self.fp1_module(*fp2_out, *sa1_out)
+        x, _, _ = self.fp0_module(*fp1_out, *sa0_out)
 
         x = F.relu(self.lin1(x))
         x = F.dropout(x, p=0.5, training=self.training)

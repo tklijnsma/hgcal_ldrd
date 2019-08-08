@@ -1,6 +1,7 @@
 import os
 import os.path as osp
 import math
+import time
 
 import numpy as np
 import torch
@@ -13,13 +14,14 @@ from torch_geometric.data import DataLoader
 import tqdm
 import argparse
 
+
 from PointNet import PointNet
 
 sig_weight = 1.0
-bkg_weight = 0.15
-lr = 0.01
+bkg_weight = 0.01
+lr = 0.0005
 n_epochs = 20
-batch_size = 12
+batch_size = 16
 
 
 device = torch.device('cuda:3' if torch.cuda.is_available() else 'cpu')
@@ -139,6 +141,7 @@ def main(args):
     tv_frac = 0.10
     tv_num = math.ceil(fulllen*tv_frac)
     splits = np.cumsum([fulllen-2*tv_num,tv_num,tv_num])
+    timestamp = time.strftime("%Y%m%d.%H%M%S", time.gmtime())
     
     train_dataset = torch.utils.data.Subset(full_dataset,np.arange(start=0,stop=splits[0]))
     valid_dataset = torch.utils.data.Subset(full_dataset,np.arange(start=splits[1],stop=splits[2]))
@@ -157,6 +160,7 @@ def main(args):
     model = PointNet(num_classes).to(device)    
 
     optimizer = torch.optim.Adam(model.parameters(), lr = lr)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', factor=0.5, patience=2)
     model_fname = get_model_fname(model)
     
     print('Model: \n%s\nParameters: %i' %
@@ -170,16 +174,17 @@ def main(args):
     for epoch in range(0, n_epochs):
         epoch_loss = train(model, optimizer, epoch, train_loader, train_samples)
         valid_loss, valid_acc, valid_eff, valid_fp, valid_fn, valid_pur = test(model, valid_loader, valid_samples)
+        scheduler.step(valid_loss)
         print('Epoch: {:02d}, Training Loss: {:.4f}'.format(epoch, epoch_loss))
         print('               Validation Loss: {:.4f}, Eff.: {:.4f}, FalsePos: {:.4f}, FalseNeg: {:.4f}, Purity: {:,.4f}'.format(valid_loss, valid_eff, valid_fp, valid_fn, valid_pur))
 
         if valid_loss < best_valid_loss:
             best_valid_loss = valid_loss
-            modpath = osp.join(os.getcwd(),model_fname+'.best.pth')
+            modpath = osp.join(os.getcwd(),model_fname+'.' + timestamp + '.best.pth')
             print('New best model saved to:',modpath)
             torch.save(model.state_dict(),modpath)
 
-    modpath = osp.join(os.getcwd(),model_fname+'.final.pth')
+    modpath = osp.join(os.getcwd(),model_fname+'.' + timestamp + '.final.pth')
     print('Final model saved to:',modpath)
     torch.save(model.state_dict(),modpath)
     
