@@ -37,23 +37,18 @@ def load_graphs(filenames, graph_type=Graph):
 
 
 #thanks Steve :-)
-def draw_sample_point(X, y, out): 
+def draw_sample_point(X, y, out, truepos, trueneg, falsepos, falseneg): 
     # Prepare the figure
     fig, (ax0,ax1) = plt.subplots(1, 2, figsize=(20,12))
 
-    truepos = np.logical_and(y, out)
-    falseneg = np.logical_and(np.logical_not(out), y)
-    falsepos = np.logical_and(out, np.logical_not(y))
-    trueneg = np.logical_and(np.logical_not(y), np.logical_not(out))
+
     
-    assert(y.shape[0] == truepos.sum() + falseneg.sum() + falsepos.sum() + trueneg.sum())
-    
-    ax0.scatter(X[truepos][:,0], X[truepos][:,2], c='green',alpha=0.7)
-    ax1.scatter(X[truepos][:,1], X[truepos][:,2], c='green',alpha=0.7)    
-    ax0.scatter(X[falseneg][:,0], X[falseneg][:,2], c='red',alpha=0.7)
-    ax1.scatter(X[falseneg][:,1], X[falseneg][:,2], c='red',alpha=0.7)
-    ax0.scatter(X[falsepos][:,0], X[falsepos][:,2], c='blue',alpha=0.2)
-    ax1.scatter(X[falsepos][:,1], X[falsepos][:,2], c='blue',alpha=0.2)    
+    ax0.scatter(X[truepos][:,0], X[truepos][:,2], c='green',alpha=0.2)
+    ax1.scatter(X[truepos][:,1], X[truepos][:,2], c='green',alpha=0.2)    
+    ax0.scatter(X[falseneg][:,0], X[falseneg][:,2], c='red',alpha=0.2)
+    ax1.scatter(X[falseneg][:,1], X[falseneg][:,2], c='red',alpha=0.2)
+    ax0.scatter(X[falsepos][:,0], X[falsepos][:,2], c='blue',alpha=0.1)
+    ax1.scatter(X[falsepos][:,1], X[falsepos][:,2], c='blue',alpha=0.1)    
     ax0.scatter(X[trueneg][:,0], X[trueneg][:,2], c='k',alpha=0.02)
     ax1.scatter(X[trueneg][:,1], X[trueneg][:,2], c='k',alpha=0.02)
     
