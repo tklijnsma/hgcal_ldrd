@@ -1,5 +1,6 @@
 import os
 import os.path as osp
+import sys
 import math
 import time
 
@@ -26,6 +27,21 @@ batch_size = 16
 
 device = torch.device('cuda:3' if torch.cuda.is_available() else 'cpu')
 print('using device %s'%device)
+
+
+class Logger(object):
+    def __init__(self):
+        self.terminal = sys.stdout
+        self.log = open("stdout.log", "a")
+
+    def write(self, message):
+        self.terminal.write(message)
+        self.log.write(message)  
+
+    def flush(self):
+        pass    
+
+sys.stdout = Logger()
 
 def get_model_fname(model):
     model_name = type(model).__name__
@@ -64,9 +80,6 @@ def train(model, optimizer, epoch, loader, total):
         t.refresh() # to show immediately the update
         sum_loss += batch_loss_item
         optimizer.step()
-
-    modpath = osp.join(os.getcwd(),model_fname+'.%d.pth'%epoch)
-    torch.save(model.state_dict(),modpath)
     
     return sum_loss/(i+1)
 
@@ -134,7 +147,7 @@ def test(model,loader,total):
 
 
 def main(args):    
-    
+
     path = osp.join(osp.dirname(osp.realpath(__file__)), '..', '..', 'data', 'npz','partGun_PDGid15_x1000_Pt3.0To100.0_NTUP_1')
     full_dataset = HitGraphDatasetG(path)
     fulllen = len(full_dataset)
@@ -177,14 +190,19 @@ def main(args):
         scheduler.step(valid_loss)
         print('Epoch: {:02d}, Training Loss: {:.4f}'.format(epoch, epoch_loss))
         print('               Validation Loss: {:.4f}, Eff.: {:.4f}, FalsePos: {:.4f}, FalseNeg: {:.4f}, Purity: {:,.4f}'.format(valid_loss, valid_eff, valid_fp, valid_fn, valid_pur))
-
+        
+        tag = "eff"+str(valid_eff)+".purity"+str(valid_pur)
+        
         if valid_loss < best_valid_loss:
             best_valid_loss = valid_loss
-            modpath = osp.join(os.getcwd(),model_fname+'.' + timestamp + '.best.pth')
+            modpath = osp.join(os.getcwd(),model_fname+'.' + tag + "." + timestamp + '.%d.best.pth'%epoch)
             print('New best model saved to:',modpath)
-            torch.save(model.state_dict(),modpath)
+        else:
+            modpath = osp.join(os.getcwd(),model_fname+'.' + tag + "." + timestamp +'.%d.pth'%epoch)            
+        torch.save(model.state_dict(),modpath)
+            
 
-    modpath = osp.join(os.getcwd(),model_fname+'.' + timestamp + '.final.pth')
+    modpath = osp.join(os.getcwd(),model_fname+'.' + tag + "." + timestamp + '.final.pth')
     print('Final model saved to:',modpath)
     torch.save(model.state_dict(),modpath)
     

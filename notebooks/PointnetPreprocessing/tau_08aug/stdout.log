@@ -1,0 +1,218 @@
+num_classes 2
+Model: 
+PointNet(
+  (sa1_module): SAModule(
+    (conv): PointConv(local_nn=Sequential(
+      (0): Sequential(
+        (0): Linear(in_features=9, out_features=32, bias=True)
+        (1): ReLU()
+        (2): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (1): Sequential(
+        (0): Linear(in_features=32, out_features=32, bias=True)
+        (1): ReLU()
+        (2): BatchNorm1d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (2): Sequential(
+        (0): Linear(in_features=32, out_features=64, bias=True)
+        (1): ReLU()
+        (2): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    ), global_nn=None)
+  )
+  (sa2_module): SAModule(
+    (conv): PointConv(local_nn=Sequential(
+      (0): Sequential(
+        (0): Linear(in_features=67, out_features=64, bias=True)
+        (1): ReLU()
+        (2): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (1): Sequential(
+        (0): Linear(in_features=64, out_features=64, bias=True)
+        (1): ReLU()
+        (2): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (2): Sequential(
+        (0): Linear(in_features=64, out_features=128, bias=True)
+        (1): ReLU()
+        (2): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    ), global_nn=None)
+  )
+  (sa3_module): SAModule(
+    (conv): PointConv(local_nn=Sequential(
+      (0): Sequential(
+        (0): Linear(in_features=131, out_features=128, bias=True)
+        (1): ReLU()
+        (2): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (1): Sequential(
+        (0): Linear(in_features=128, out_features=128, bias=True)
+        (1): ReLU()
+        (2): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (2): Sequential(
+        (0): Linear(in_features=128, out_features=256, bias=True)
+        (1): ReLU()
+        (2): BatchNorm1d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    ), global_nn=None)
+  )
+  (sa4_module): GlobalSAModule(
+    (nn): Sequential(
+      (0): Sequential(
+        (0): Linear(in_features=259, out_features=256, bias=True)
+        (1): ReLU()
+        (2): BatchNorm1d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (1): Sequential(
+        (0): Linear(in_features=256, out_features=512, bias=True)
+        (1): ReLU()
+        (2): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (2): Sequential(
+        (0): Linear(in_features=512, out_features=1024, bias=True)
+        (1): ReLU()
+        (2): BatchNorm1d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+  )
+  (fp3_module): FPModule(
+    (nn): Sequential(
+      (0): Sequential(
+        (0): Linear(in_features=1280, out_features=256, bias=True)
+        (1): ReLU()
+        (2): BatchNorm1d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (1): Sequential(
+        (0): Linear(in_features=256, out_features=256, bias=True)
+        (1): ReLU()
+        (2): BatchNorm1d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+  )
+  (fp2_module): FPModule(
+    (nn): Sequential(
+      (0): Sequential(
+        (0): Linear(in_features=384, out_features=256, bias=True)
+        (1): ReLU()
+        (2): BatchNorm1d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (1): Sequential(
+        (0): Linear(in_features=256, out_features=128, bias=True)
+        (1): ReLU()
+        (2): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+  )
+  (fp1_module): FPModule(
+    (nn): Sequential(
+      (0): Sequential(
+        (0): Linear(in_features=192, out_features=128, bias=True)
+        (1): ReLU()
+        (2): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (1): Sequential(
+        (0): Linear(in_features=128, out_features=64, bias=True)
+        (1): ReLU()
+        (2): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+  )
+  (fp0_module): FPModule(
+    (nn): Sequential(
+      (0): Sequential(
+        (0): Linear(in_features=70, out_features=64, bias=True)
+        (1): ReLU()
+        (2): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (1): Sequential(
+        (0): Linear(in_features=64, out_features=64, bias=True)
+        (1): ReLU()
+        (2): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (2): Sequential(
+        (0): Linear(in_features=64, out_features=64, bias=True)
+        (1): ReLU()
+        (2): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+  )
+  (lin1): Linear(in_features=64, out_features=64, bias=True)
+  (lin2): Linear(in_features=64, out_features=64, bias=True)
+  (lin3): Linear(in_features=64, out_features=2, bias=True)
+)
+Parameters: 1397602
+Training with 1600 samples
+Validating with 200 samples
+scor 182230 stru 182230 sfls 3879268 stp 182230 stn 0 sfp 3879268 sfn 0 stot 4061498
+Epoch: 00, Training Loss: 0.4203
+               Validation Loss: 1.1700, Eff.: 1.0000, FalsePos: 1.0000, FalseNeg: 0.0000, Purity: 0.0449
+New best model saved to: /home/scratch/sitonga/hgcal_ldrd/notebooks/PointnetPreprocessing/PointNet_1397602_26d89c5565_sitonga.eff0.9999999999945124.purity0.04486768182575866.20190808.164925.0.best.pth
+scor 3874534 stru 182230 sfls 3879268 stp 174288 stn 3700246 sfp 179022 sfn 7942 stot 4061498
+Epoch: 01, Training Loss: 0.2046
+               Validation Loss: 0.3811, Eff.: 0.9564, FalsePos: 0.0461, FalseNeg: 0.0436, Purity: 0.4933
+New best model saved to: /home/scratch/sitonga/hgcal_ldrd/notebooks/PointnetPreprocessing/PointNet_1397602_26d89c5565_sitonga.eff0.9564177138728177.purity0.4933005009750833.20190808.164925.1.best.pth
+scor 3842443 stru 182230 sfls 3879268 stp 178030 stn 3664413 sfp 214855 sfn 4200 stot 4061498
+Epoch: 02, Training Loss: 0.1070
+               Validation Loss: 0.2097, Eff.: 0.9770, FalsePos: 0.0554, FalseNeg: 0.0230, Purity: 0.4531
+New best model saved to: /home/scratch/sitonga/hgcal_ldrd/notebooks/PointnetPreprocessing/PointNet_1397602_26d89c5565_sitonga.eff0.9769522032542558.purity0.45313514132518895.20190808.164925.2.best.pth
+scor 3797684 stru 182230 sfls 3879268 stp 179181 stn 3618503 sfp 260765 sfn 3049 stot 4061498
+Epoch: 03, Training Loss: 0.0867
+               Validation Loss: 0.2226, Eff.: 0.9833, FalsePos: 0.0672, FalseNeg: 0.0167, Purity: 0.4073
+scor 3815150 stru 182230 sfls 3879268 stp 179210 stn 3635940 sfp 243328 sfn 3020 stot 4061498
+Epoch: 04, Training Loss: 0.0790
+               Validation Loss: 0.1977, Eff.: 0.9834, FalsePos: 0.0627, FalseNeg: 0.0166, Purity: 0.4241
+New best model saved to: /home/scratch/sitonga/hgcal_ldrd/notebooks/PointnetPreprocessing/PointNet_1397602_26d89c5565_sitonga.eff0.9834275366241374.purity0.42412753409060455.20190808.164925.4.best.pth
+scor 3822507 stru 182230 sfls 3879268 stp 179271 stn 3643236 sfp 236032 sfn 2959 stot 4061498
+Epoch: 05, Training Loss: 0.0745
+               Validation Loss: 0.1827, Eff.: 0.9838, FalsePos: 0.0608, FalseNeg: 0.0162, Purity: 0.4317
+New best model saved to: /home/scratch/sitonga/hgcal_ldrd/notebooks/PointnetPreprocessing/PointNet_1397602_26d89c5565_sitonga.eff0.9837622784339364.purity0.43166314714694654.20190808.164925.5.best.pth
+scor 3808291 stru 182230 sfls 3879268 stp 179261 stn 3629030 sfp 250238 sfn 2969 stot 4061498
+Epoch: 06, Training Loss: 0.0719
+               Validation Loss: 0.2039, Eff.: 0.9837, FalsePos: 0.0645, FalseNeg: 0.0163, Purity: 0.4174
+scor 3824781 stru 182230 sfls 3879268 stp 179269 stn 3645512 sfp 233756 sfn 2961 stot 4061498
+Epoch: 07, Training Loss: 0.0695
+               Validation Loss: 0.1652, Eff.: 0.9838, FalsePos: 0.0603, FalseNeg: 0.0162, Purity: 0.4340
+New best model saved to: /home/scratch/sitonga/hgcal_ldrd/notebooks/PointnetPreprocessing/PointNet_1397602_26d89c5565_sitonga.eff0.9837513032926315.purity0.4340391017482379.20190808.164925.7.best.pth
+scor 3815319 stru 182230 sfls 3879268 stp 179425 stn 3635894 sfp 243374 sfn 2805 stot 4061498
+Epoch: 08, Training Loss: 0.0676
+               Validation Loss: 0.1811, Eff.: 0.9846, FalsePos: 0.0627, FalseNeg: 0.0154, Purity: 0.4244
+scor 3823510 stru 182230 sfls 3879268 stp 179425 stn 3644085 sfp 235183 sfn 2805 stot 4061498
+Epoch: 09, Training Loss: 0.0662
+               Validation Loss: 0.1702, Eff.: 0.9846, FalsePos: 0.0606, FalseNeg: 0.0154, Purity: 0.4328
+scor 3825247 stru 182230 sfls 3879268 stp 179407 stn 3645840 sfp 233428 sfn 2823 stot 4061498
+Epoch: 10, Training Loss: 0.0644
+               Validation Loss: 0.1687, Eff.: 0.9845, FalsePos: 0.0602, FalseNeg: 0.0155, Purity: 0.4346
+scor 3836952 stru 182230 sfls 3879268 stp 179502 stn 3657450 sfp 221818 sfn 2728 stot 4061498
+Epoch: 11, Training Loss: 0.0613
+               Validation Loss: 0.1584, Eff.: 0.9850, FalsePos: 0.0572, FalseNeg: 0.0150, Purity: 0.4473
+New best model saved to: /home/scratch/sitonga/hgcal_ldrd/notebooks/PointnetPreprocessing/PointNet_1397602_26d89c5565_sitonga.eff0.9850299072546506.purity0.4472789793669708.20190808.164925.11.best.pth
+scor 3855465 stru 182230 sfls 3879268 stp 179418 stn 3676047 sfp 203221 sfn 2812 stot 4061498
+Epoch: 12, Training Loss: 0.0604
+               Validation Loss: 0.1477, Eff.: 0.9846, FalsePos: 0.0524, FalseNeg: 0.0154, Purity: 0.4689
+New best model saved to: /home/scratch/sitonga/hgcal_ldrd/notebooks/PointnetPreprocessing/PointNet_1397602_26d89c5565_sitonga.eff0.9845689513198453.purity0.4688962703737233.20190808.164925.12.best.pth
+scor 3835905 stru 182230 sfls 3879268 stp 179595 stn 3656310 sfp 222958 sfn 2635 stot 4061498
+Epoch: 13, Training Loss: 0.0591
+               Validation Loss: 0.1587, Eff.: 0.9855, FalsePos: 0.0575, FalseNeg: 0.0145, Purity: 0.4461
+scor 3837373 stru 182230 sfls 3879268 stp 179653 stn 3657720 sfp 221548 sfn 2577 stot 4061498
+Epoch: 14, Training Loss: 0.0584
+               Validation Loss: 0.1572, Eff.: 0.9859, FalsePos: 0.0571, FalseNeg: 0.0141, Purity: 0.4478
+scor 3852355 stru 182230 sfls 3879268 stp 179521 stn 3672834 sfp 206434 sfn 2709 stot 4061498
+Epoch: 15, Training Loss: 0.0579
+               Validation Loss: 0.1458, Eff.: 0.9851, FalsePos: 0.0532, FalseNeg: 0.0149, Purity: 0.4651
+New best model saved to: /home/scratch/sitonga/hgcal_ldrd/notebooks/PointnetPreprocessing/PointNet_1397602_26d89c5565_sitonga.eff0.9851341710970469.purity0.4651345364084799.20190808.164925.15.best.pth
+scor 3862940 stru 182230 sfls 3879268 stp 179397 stn 3683543 sfp 195725 sfn 2833 stot 4061498
+Epoch: 16, Training Loss: 0.0572
+               Validation Loss: 0.1379, Eff.: 0.9845, FalsePos: 0.0505, FalseNeg: 0.0155, Purity: 0.4782
+New best model saved to: /home/scratch/sitonga/hgcal_ldrd/notebooks/PointnetPreprocessing/PointNet_1397602_26d89c5565_sitonga.eff0.9844537123361441.purity0.47823641375211734.20190808.164925.16.best.pth
+scor 3849077 stru 182230 sfls 3879268 stp 179536 stn 3669541 sfp 209727 sfn 2694 stot 4061498
+Epoch: 17, Training Loss: 0.0564
+               Validation Loss: 0.1486, Eff.: 0.9852, FalsePos: 0.0541, FalseNeg: 0.0148, Purity: 0.4612
+scor 3848835 stru 182230 sfls 3879268 stp 179642 stn 3669193 sfp 210075 sfn 2588 stot 4061498
+Epoch: 18, Training Loss: 0.0558
+               Validation Loss: 0.1479, Eff.: 0.9858, FalsePos: 0.0542, FalseNeg: 0.0142, Purity: 0.4610
+scor 3828114 stru 182230 sfls 3879268 stp 179815 stn 3648299 sfp 230969 sfn 2415 stot 4061498
+Epoch: 19, Training Loss: 0.0556
+               Validation Loss: 0.1630, Eff.: 0.9867, FalsePos: 0.0595, FalseNeg: 0.0133, Purity: 0.4377
+Final model saved to: /home/scratch/sitonga/hgcal_ldrd/notebooks/PointnetPreprocessing/PointNet_1397602_26d89c5565_sitonga.eff0.9867475168688649.purity0.43773613383082655.20190808.164925.final.pth

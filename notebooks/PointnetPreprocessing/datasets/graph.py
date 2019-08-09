@@ -37,7 +37,7 @@ def load_graphs(filenames, graph_type=Graph):
 
 
 #thanks Steve :-)
-def draw_sample_point(X, y, out, truepos, trueneg, falsepos, falseneg): 
+def draw_sample_point(X, y, out, truepos, trueneg, falsepos, falseneg, sampled = []): 
     # Prepare the figure
     fig, (ax0,ax1) = plt.subplots(1, 2, figsize=(20,12))
 
@@ -51,6 +51,11 @@ def draw_sample_point(X, y, out, truepos, trueneg, falsepos, falseneg):
     ax1.scatter(X[falsepos][:,1], X[falsepos][:,2], c='blue',alpha=0.1)    
     ax0.scatter(X[trueneg][:,0], X[trueneg][:,2], c='k',alpha=0.02)
     ax1.scatter(X[trueneg][:,1], X[trueneg][:,2], c='k',alpha=0.02)
+    
+    if (sampled != []):
+        ax0.scatter(sampled[:,0], sampled[:,2], c='k',s = 20)
+        ax1.scatter(sampled[:,1], sampled[:,2], c='k',s = 20)
+        
     
         
     # Adjust axes

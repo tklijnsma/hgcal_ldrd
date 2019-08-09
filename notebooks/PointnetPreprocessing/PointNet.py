@@ -59,11 +59,11 @@ class PointNet(torch.nn.Module):
     def __init__(self, num_classes):
         super(PointNet, self).__init__()
         #self.sa1_module = SAModule(0.2, 0.2, MLP([8, 64, 64, 128]))
-        self.sa1_module = SAModule(0.4, 1.6, MLP([9, 32, 32, 64]))
+        self.sa1_module = SAModule(0.4, 4.0, MLP([9, 32, 32, 64]))
         #self.sa2_module = SAModule(0.25, 0.4, MLP([128 + 3, 128, 128, 256]))
-        self.sa2_module = SAModule(0.4, 3.5, MLP([64 + 3, 64, 64, 128]))
+        self.sa2_module = SAModule(0.3, 7.0, MLP([64 + 3, 64, 64, 128]))
         
-        self.sa3_module = SAModule(0.4, 10.0, MLP([128 + 3, 128, 128, 256]))
+        self.sa3_module = SAModule(0.5, 14.0, MLP([128 + 3, 128, 128, 256]))
         
         self.sa4_module = GlobalSAModule(MLP([256 + 3, 256, 512, 1024]))
 
