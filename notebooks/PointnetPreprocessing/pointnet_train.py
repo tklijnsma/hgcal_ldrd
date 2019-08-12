@@ -19,27 +19,29 @@ import argparse
 from PointNet import PointNet
 
 sig_weight = 1.0
-bkg_weight = 0.01
-lr = 0.0005
-n_epochs = 20
-batch_size = 16
+bkg_weight = 0.1
+lr = 0.0001
+n_epochs = 40
+batch_size = 8
 
 
 device = torch.device('cuda:3' if torch.cuda.is_available() else 'cpu')
 print('using device %s'%device)
 
+timestamp = time.strftime("%Y%m%d.%H%M%S", time.gmtime())
 
 class Logger(object):
     def __init__(self):
         self.terminal = sys.stdout
-        self.log = open("stdout.log", "a")
+        self.log = open(timestamp + ".stdout", "a")
 
     def write(self, message):
         self.terminal.write(message)
         self.log.write(message)  
+        self.log.flush()
 
     def flush(self):
-        pass    
+        pass  
 
 sys.stdout = Logger()
 
@@ -67,16 +69,18 @@ def train(model, optimizer, epoch, loader, total):
     for i,data in t:
         data = data.to(device)
         batch_target = data.y
-        #batch_weights_real = batch_target*sig_weight
-        #batch_weights_fake = (1 - batch_target)*bkg_weight
-        #batch_weights = batch_weights_real + batch_weights_fake
+        batch_weight_in_event = data.weight_in_event
+        
+        batch_weights_real = batch_target*batch_weight_in_event*sig_weight
+        batch_weights_fake = (1.0 - batch_target)*batch_weight_in_event*bkg_weight
+        batch_weights = batch_weights_real + batch_weights_fake
         optimizer.zero_grad()
         batch_output = model(data)
-        #batch_loss = F.binary_cross_entropy(batch_output, batch_target, weight=batch_weights)
-        batch_loss = F.nll_loss(batch_output, batch_target, weight=torch.tensor([bkg_weight, sig_weight], device=device))
+        batch_loss = F.binary_cross_entropy(batch_output, batch_target, weight=batch_weights)
+        #batch_loss = F.nll_loss(batch_output, batch_target, weight=torch.tensor([bkg_weight, sig_weight], device=device))
         batch_loss.backward()
         batch_loss_item = batch_loss.item()
-        t.set_description("batch loss = %.5f" % batch_loss_item)
+        t.set_description("batch loss = %.15f" % batch_loss_item)
         t.refresh() # to show immediately the update
         sum_loss += batch_loss_item
         optimizer.step()
@@ -102,27 +106,31 @@ def test(model,loader,total):
     for i,data in t:
         data = data.to(device)
         batch_target = data.y
+        batch_weight_in_event = data.weight_in_event
+        
+        batch_weights_real = batch_target*batch_weight_in_event*sig_weight
+        batch_weights_fake = (1 - batch_target)*batch_weight_in_event*bkg_weight
+        batch_weights = batch_weights_real + batch_weights_fake
         batch_output = model(data)
         #batch_loss_item = F.binary_cross_entropy(batch_output, batch_target).item()
-        batch_loss_item = F.nll_loss(batch_output, batch_target).item()
-        t.set_description("batch loss = %.5f" % batch_loss_item)
+        batch_loss_item = F.binary_cross_entropy(batch_output, batch_target, weight=batch_weights)
+        t.set_description("batch loss = %.15f" % batch_loss_item)
         t.refresh() # to show immediately the update
         sum_loss += batch_loss_item
-        batch_output = batch_output.max(dim=1)[1]
-        matches = ((batch_output == 1) == (batch_target == 1))
-        true_pos = ((batch_output == 1) & (batch_target == 1))
-        true_neg = ((batch_output == 0) & (batch_target == 0))
-        false_pos = ((batch_output == 1) & (batch_target == 0))
-        false_neg = ((batch_output == 0) & (batch_target == 1))
+        matches = ((batch_output > 0.5) == (batch_target > 0.5))
+        true_pos = ((batch_output > 0.5) & (batch_target > 0.5))
+        true_neg = ((batch_output < 0.5) & (batch_target < 0.5))
+        false_pos = ((batch_output > 0.5) & (batch_target < 0.5))
+        false_neg = ((batch_output < 0.5) & (batch_target > 0.5))
         #if i ==0:
-        #    print(np.where((batch_target == 0).data.cpu().numpy()))
+        #    print(np.where((batch_target < 0.5).data.cpu().numpy()))
         sum_truepos += true_pos.sum().item()
         sum_trueneg += true_neg.sum().item()
         sum_falsepos += false_pos.sum().item()
         sum_falseneg += false_neg.sum().item()
         sum_correct += matches.sum().item()
         sum_true += batch_target.sum().item()
-        sum_false += (batch_target == 0).sum().item()
+        sum_false += (batch_target < 0.5).sum().item()
         sum_total += matches.numel()
 
     print('scor', sum_correct,
@@ -148,13 +156,12 @@ def test(model,loader,total):
 
 def main(args):    
 
-    path = osp.join(osp.dirname(osp.realpath(__file__)), '..', '..', 'data', 'npz','partGun_PDGid15_x1000_Pt3.0To100.0_NTUP_1')
+    path = osp.join(osp.dirname(osp.realpath(__file__)), '..', '..', 'data', 'npz','partGun_PDGid15_x1000_Pt3.0To100.0_all')
     full_dataset = HitGraphDatasetG(path)
     fulllen = len(full_dataset)
-    tv_frac = 0.10
+    tv_frac = 0.05
     tv_num = math.ceil(fulllen*tv_frac)
     splits = np.cumsum([fulllen-2*tv_num,tv_num,tv_num])
-    timestamp = time.strftime("%Y%m%d.%H%M%S", time.gmtime())
     
     train_dataset = torch.utils.data.Subset(full_dataset,np.arange(start=0,stop=splits[0]))
     valid_dataset = torch.utils.data.Subset(full_dataset,np.arange(start=splits[1],stop=splits[2]))
@@ -165,15 +172,12 @@ def main(args):
     valid_samples = len(valid_dataset)
 
     d = full_dataset
-    num_features = d.num_features
-    num_classes = d[0].y.max().item() + 1 if d[0].y.dim() == 1 else d[0].y.size(1)
-    num_classes = int(num_classes)
-    print("num_classes",    num_classes)               
+    num_features = d.num_features              
     
-    model = PointNet(num_classes).to(device)    
+    model = PointNet().to(device)    
 
     optimizer = torch.optim.Adam(model.parameters(), lr = lr)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', factor=0.5, patience=2)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', factor=0.5, patience=3)
     model_fname = get_model_fname(model)
     
     print('Model: \n%s\nParameters: %i' %
@@ -188,10 +192,10 @@ def main(args):
         epoch_loss = train(model, optimizer, epoch, train_loader, train_samples)
         valid_loss, valid_acc, valid_eff, valid_fp, valid_fn, valid_pur = test(model, valid_loader, valid_samples)
         scheduler.step(valid_loss)
-        print('Epoch: {:02d}, Training Loss: {:.4f}'.format(epoch, epoch_loss))
-        print('               Validation Loss: {:.4f}, Eff.: {:.4f}, FalsePos: {:.4f}, FalseNeg: {:.4f}, Purity: {:,.4f}'.format(valid_loss, valid_eff, valid_fp, valid_fn, valid_pur))
+        print('Epoch: {:02d}, Training Loss: {:.15f}'.format(epoch, epoch_loss))
+        print('               Validation Loss: {:.15f}, Eff.: {:.4f}, FalsePos: {:.4f}, FalseNeg: {:.4f}, Purity: {:,.4f}'.format(valid_loss, valid_eff, valid_fp, valid_fn, valid_pur))
         
-        tag = "eff"+str(valid_eff)+".purity"+str(valid_pur)
+        tag = ("eff%.4f" % valid_eff)+(".purity%.4f" % valid_pur)
         
         if valid_loss < best_valid_loss:
             best_valid_loss = valid_loss

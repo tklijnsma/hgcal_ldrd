@@ -56,25 +56,32 @@ class FPModule(torch.nn.Module):
 
 
 class PointNet(torch.nn.Module):
-    def __init__(self, num_classes):
+    def __init__(self):
         super(PointNet, self).__init__()
-        #self.sa1_module = SAModule(0.2, 0.2, MLP([8, 64, 64, 128]))
-        self.sa1_module = SAModule(0.4, 4.0, MLP([9, 32, 32, 64]))
-        #self.sa2_module = SAModule(0.25, 0.4, MLP([128 + 3, 128, 128, 256]))
-        self.sa2_module = SAModule(0.3, 7.0, MLP([64 + 3, 64, 64, 128]))
+        pos_dim = 3
+        feature_dim = 3
+        sa1_dim = 64
+        sa2_dim = 128
+        sa3_dim = 256
+        sa4_dim = 256
         
-        self.sa3_module = SAModule(0.5, 14.0, MLP([128 + 3, 128, 128, 256]))
-        
-        self.sa4_module = GlobalSAModule(MLP([256 + 3, 256, 512, 1024]))
+        self.sa1_module = SAModule(0.4, 4.0, MLP([pos_dim+feature_dim, sa1_dim, sa1_dim, sa2_dim]))
 
-        self.fp3_module = FPModule(1, MLP([1024 + 256, 256, 256]))
-        self.fp2_module = FPModule(3, MLP([256 + 128, 256, 128]))
-        self.fp1_module = FPModule(3, MLP([128 + 64, 128, 64]))
-        self.fp0_module = FPModule(3, MLP([64 + 6, 64, 64, 64]))
+        self.sa2_module = SAModule(0.3, 7.0, MLP([pos_dim + sa2_dim , sa2_dim, sa2_dim, sa3_dim]))
+        
+        self.sa3_module = SAModule(0.5, 14.0, MLP([pos_dim + sa3_dim, sa3_dim, sa3_dim, sa4_dim]))
+        
+        self.sa4_module = GlobalSAModule(MLP([pos_dim + sa4_dim, sa4_dim, 512, 1024]))
+
+        self.fp3_module = FPModule(1, MLP([1024 + sa4_dim, sa4_dim, sa4_dim]))
+        self.fp2_module = FPModule(3, MLP([sa4_dim + sa3_dim, sa4_dim, sa3_dim]))
+        self.fp1_module = FPModule(3, MLP([sa3_dim + sa2_dim, sa3_dim, sa2_dim]))
+        self.fp0_module = FPModule(3, MLP([sa2_dim + feature_dim, sa2_dim, 64]))
 
         self.lin1 = torch.nn.Linear(64, 64)
         self.lin2 = torch.nn.Linear(64, 64)
-        self.lin3 = torch.nn.Linear(64, num_classes)
+        self.lin3 = torch.nn.Linear(64, 1)
+        self.sigmoid = torch.nn.Sigmoid()
 
     def forward(self, data):
         sa0_out = (data.x, data.pos, data.batch)
@@ -93,5 +100,6 @@ class PointNet(torch.nn.Module):
         x = self.lin2(x)
         x = F.dropout(x, p=0.5, training=self.training)
         x = self.lin3(x)
-        return F.log_softmax(x, dim=-1)
+        x = self.sigmoid(x.squeeze())
+        return x
 

@@ -53,15 +53,23 @@ class HitGraphDatasetG(DatasetG):
     def process(self):
         #convert the npz into pytorch tensors and save them
         path = self.processed_dir
-        for idx,raw_path in enumerate(tqdm(self.raw_paths)):
+        for idx,raw_path in tqdm(enumerate(self.raw_paths), desc='event processed'):
             g = load_graph(raw_path)
 
-            x = g.X.astype(np.float32)
+            x = g.X.astype(np.float32)[:,3:]
             pos = g.X.astype(np.float32)[:,:3]
-            y = g.y.astype(np.int_)
+            y = g.y.astype(np.float32)
+            if (y.sum() != 0):
+                weight_in_event = (y * (1 / y.sum()) + (1-y) * (1 / (y.shape[0] - y.sum()))).astype(np.float32)
+            else:
+                weight_in_event = np.ones(y.shape[0]).astype(np.float32)
+                            
+            
             outdata = DataG(x=torch.from_numpy(x),
                             pos=torch.from_numpy(pos),
-                            y=torch.from_numpy(y))
+                            y=torch.from_numpy(y),
+                            weight_in_event=torch.from_numpy(weight_in_event))
+            
             
             torch.save(outdata, osp.join(self.processed_dir, 'data_{}.pt'.format(idx)))
 
