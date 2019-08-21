@@ -98,6 +98,8 @@ def draw_sample_validation(X, Ri, Ro, y,
     ax0.set_ylabel('$layer$ [arb]')
     ax1.set_ylabel('$layer$ [arb]')
     plt.tight_layout()
+
+    plt.savefig('testgraph.png')
     return fig, ax0, ax1
 
 def draw_sample3d(X, Ri, Ro, y, 
