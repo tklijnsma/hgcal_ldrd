@@ -20,6 +20,9 @@ from models import get_model, get_losses
 from .base import base
 
 
+import logging
+logger = logging.getLogger('root')
+
 class GNNTrainer(base):
     """Trainer code for basic classification problems with binomial cross entropy."""
 
@@ -141,6 +144,11 @@ class GNNTrainer(base):
             batch_input = data.to(self.device)
             batch_target = data.y
             batch_output = self.model(batch_input)
+
+            logger.debug('batch_input  = %s', batch_input)
+            logger.debug('batch_target = %s', batch_target)
+            logger.debug('batch_output = %s', batch_output)
+
             batch_loss = self.loss_func(batch_output, batch_target)
             sum_loss += batch_loss.item()
             # Count number of correct predictions
@@ -149,8 +157,15 @@ class GNNTrainer(base):
             
             truth_cat_counts = torch.unique(batch_target, return_counts = True)
             pred = torch.argmax(batch_output,dim=-1)
+
+            logger.debug('truth_cat_counts = %s', truth_cat_counts)
+            logger.debug('pred = %s', pred)
+            logger.debug('batch_target = %s', batch_target)
             
             for j in range(cat_wgt_shape):
+                logger.debug('j = %s', j)
+                testval = batch_target == j
+                logger.debug('batch_target == j  =  %s', testval)
                 cat_counts = torch.unique(pred[batch_target == j], return_counts=True)                
                 confusion_num[:,j][cat_counts[0]] += cat_counts[1].float()
                 confusion_denm[j,:][truth_cat_counts[0]] += truth_cat_counts[1].float()
