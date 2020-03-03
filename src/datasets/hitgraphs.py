@@ -18,6 +18,9 @@ from torch_geometric.data import (Data, Dataset)
 # Local imports
 from datasets.graph import load_graph
 
+import logging, sys
+logger = logging.getLogger('glue')
+
 class HitGraphDataset(Dataset):
     """PyTorch geometric dataset from processed hit information"""
     
@@ -59,7 +62,7 @@ class HitGraphDataset(Dataset):
         for idx,raw_path in enumerate(tqdm(self.raw_paths)):
 
             g = load_graph(raw_path)
-            
+
             Ro = g.Ro[0].T.astype(np.int64)
             Ri = g.Ri[0].T.astype(np.int64)
             
@@ -71,11 +74,38 @@ class HitGraphDataset(Dataset):
             y = g.y.astype(np.int64)
             if not self._categorical:
                 y = g.y.astype(np.float32)
-            #print('y type',y.dtype)
+            
+            y_nodes = np.zeros(x.shape[0])
+            categories = np.unique(y)
+            # logger.debug('Found categories: %s', categories)
+            for i_category in categories:
+                # Get all the edges belonging to this category
+                indices_edges_this_category = (y == i_category)
+                # Get all the nodes belonging to this category
+                # (Use both ingoing and outgoing)
+                node_indices_this_category = np.unique(np.concatenate((
+                    edge_index[0][indices_edges_this_category],
+                    edge_index[1][indices_edges_this_category]
+                    )))
+                # Set the y value to the category
+                y_nodes[node_indices_this_category] = i_category
+
+            # # Testing
+            # some_cat3_edge = np.nonzero(y == 3)[0][0] # Get the 0th edge that is category 3
+            # logger.debug('some_cat3_edge = %s', some_cat3_edge)
+            # # Get the nodes connected to that edge
+            # node_in = edge_index[0][some_cat3_edge]
+            # node_out = edge_index[1][some_cat3_edge]
+            # logger.debug('node_in = %s, y_nodes[node_in] = %s', node_in, y_nodes[node_in])
+            # logger.debug('node_out = %s, y_nodes[node_out] = %s', node_out, y_nodes[node_out])
+            # assert y_nodes[node_in] == 3
+            # assert y_nodes[node_out] == 3
+
             outdata = Data(x=torch.from_numpy(x),
                            edge_index=torch.from_numpy(edge_index),
                            y=torch.from_numpy(y))
-            
+            outdata.y_nodes = torch.from_numpy(y_nodes.astype(np.int64))
+
             if not self._directed and not outdata.is_undirected():
                 rows,cols = outdata.edge_index
                 temp = torch.stack((cols,rows))
@@ -83,3 +113,4 @@ class HitGraphDataset(Dataset):
                 outdata.y = torch.cat([outdata.y,outdata.y])
         
             torch.save(outdata, osp.join(self.processed_dir, 'data_{}.pt'.format(idx)))
+

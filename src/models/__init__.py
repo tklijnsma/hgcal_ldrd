@@ -17,6 +17,12 @@ _models = {'EdgeNetWithCategories': EdgeNetWithCategories,
            'DynamicReductionNetwork': DynamicReductionNetwork,
 }
 
+from .PVCNN import PVConvForHGCAL
+if not(PVConvForHGCAL is None):
+    _models['PVCNN'] = PVConvForHGCAL
+else:
+    print('No model PVCNN')
+
 _losses = {'energy_fraction_loss': energy_fraction_loss,
 }
 
