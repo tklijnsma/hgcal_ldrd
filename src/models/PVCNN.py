@@ -152,6 +152,11 @@ if continue_importing:
             # Remove the (1, ...), and transpose to (n_hits, n_categories)
             output = torch.t(output.squeeze(0))
             logger.debug('output.size() = %s', output.size())
+            logger.debug('output = %s', output)
+            output = nn.functional.log_softmax(output, 1)
+            logger.debug('After applying log_softmax:')
+            logger.debug('output.size() = %s', output.size())
+            logger.debug('output = %s', output)
             return output
 
 

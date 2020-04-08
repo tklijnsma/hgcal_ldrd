@@ -78,7 +78,7 @@ class GNNTrainer(base):
         cat_weights = self._category_weights
         
         acc_rate = 10.
-        acc_norm = 1./acc_rate        
+        acc_norm = 1./acc_rate
         acc_loss = 0.
         
         self.optimizer.zero_grad()
