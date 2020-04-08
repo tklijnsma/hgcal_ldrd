@@ -218,7 +218,7 @@ def main():
     PVCNN_PATH = osp.join(THISDIR, '../../pvcnn') # Or wherever you cloned it to
     if not osp.exists(PVCNN_PATH): raise RuntimeError('Make sure you cloned the pvcnn repository')
     sys.path.append(PVCNN_PATH)
-    script = TrainingScript(debug=True) # Debug mode runs only a few events to check for bugs
+    script = TrainingScript(debug=False) # Debug mode runs only a few events to check for bugs
     # Here's how to load a checkpoint:
     # script.load_checkpoint = 'training-Mar06-epoch-15-29/output/checkpoints/model_checkpoint_PVConvForHGCAL_2562244_9c8b11eb88_klijnsma_014.pth.tar'
     script.train()
