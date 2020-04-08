@@ -215,7 +215,8 @@ class TrainingScript(object):
 
 
 def main():
-    PVCNN_PATH = osp.join('../../pvcnn') # Or wherever you cloned it to
+    PVCNN_PATH = osp.join(THISDIR, '../../pvcnn') # Or wherever you cloned it to
+    if not os.exists(PVCNN_PATH): raise RuntimeError('Make sure you cloned the pvcnn repository')
     sys.path.append(PVCNN_PATH)
     script = TrainingScript(debug=True) # Debug mode runs only a few events to check for bugs
     # Here's how to load a checkpoint:
