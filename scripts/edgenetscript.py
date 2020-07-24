@@ -80,17 +80,17 @@ class TrainingScript(object):
         self.load_checkpoint = None
         self._has_full_dataset = False
         self._has_trainer = False
+        self.prevent_reprocessing = False # If set to to True, prevents data re-preprocessing for debug mode
 
     def get_full_dataset(self):
         if self._has_full_dataset: return self.full_dataset, self.train_dataset, self.valid_dataset
         if not osp.isdir(self.dataset_path):
             raise OSError('{0} is not a valid path'.format(self.dataset_path))
 
-        if self.debug and 'debug' in self.dataset_path:
-            processed_path = osp.join(self.dataset_path, 'processed')
-            if osp.isdir(processed_path):
-                logger.warning('Debug sample: Removing %s to force reprocessing', processed_path)
-                shutil.rmtree(processed_path)
+        processed_path = osp.join(self.dataset_path, 'processed')
+        if self.debug and 'debug' in self.dataset_path and osp.isdir(processed_path) and not self.prevent_reprocessing:
+            logger.warning('Debug sample: Removing %s to force reprocessing', processed_path)
+            shutil.rmtree(processed_path)
 
         logger.info('Using dataset_path %s', self.dataset_path)
         full_dataset = HitGraphDataset(

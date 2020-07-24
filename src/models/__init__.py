@@ -17,6 +17,15 @@ _models = {'EdgeNetWithCategories': EdgeNetWithCategories,
            'DynamicReductionNetwork': DynamicReductionNetwork,
 }
 
+import os
+do_jittable = bool(os.environ.get('HGCAL_JITTABLE', False))
+if do_jittable:
+  print('DOING JITTABLE STUFF')
+  from .EdgeNetWithCategories import EdgeNetWithCategoriesJittable
+  _models['EdgeNetWithCategoriesJittable'] = EdgeNetWithCategoriesJittable
+else:
+  print('Not doing jittable stuff')
+
 _losses = {'energy_fraction_loss': energy_fraction_loss,
 }
 
