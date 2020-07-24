@@ -1,3 +1,26 @@
+# Jit EdgeNetWithCategories
+
+Working environment (24 July 2020):
+
+```
+conda install cudatoolkit=10.2
+conda install -c pytorch pytorch=1.5.0
+
+export CUDA="cu102"
+pip install torch-scatter==latest+${CUDA} -f https://pytorch-geometric.com/whl/torch-1.5.0.html
+pip install torch-sparse==latest+${CUDA} -f https://pytorch-geometric.com/whl/torch-1.5.0.html
+pip install torch-cluster==latest+${CUDA} -f https://pytorch-geometric.com/whl/torch-1.5.0.html
+pip install torch-spline-conv==latest+${CUDA} -f https://pytorch-geometric.com/whl/torch-1.5.0.html
+
+git clone https://github.com/rusty1s/pytorch_geometric.git -b 1.6.0
+pip install -e pytorch_geometric/
+```
+
+`pip install torch-geometric` might work again in the nearby future if the pypi packaging is fixed.
+
+Jit EdgeNetWithCategories with [scripts/jit_edgenetwithcategories.py](scripts/jit_edgenetwithcategories.py) .
+
+
 # hgcal_ldrd
 Code repository for HGCal LDRD
 
