@@ -4,7 +4,7 @@ Python module for holding our PyTorch models.
 
 from .EdgeNet import EdgeNet
 from .EdgeNet2 import EdgeNet2
-from .EdgeNetWithCategories import EdgeNetWithCategories
+from .EdgeNetWithCategories import EdgeNetWithCategories, EdgeNetWithCategoriesJittable
 from .DynamicReductionNetwork import DynamicReductionNetwork
 from .gnn_geometric import GNNSegmentClassifier    
 from .GravNet import GravNet, energy_fraction_loss
@@ -15,16 +15,8 @@ _models = {'EdgeNetWithCategories': EdgeNetWithCategories,
            'heptrkx_segment_classifier': GNNSegmentClassifier,
            'GravNet': GravNet,
            'DynamicReductionNetwork': DynamicReductionNetwork,
+           'EdgeNetWithCategoriesJittable' : EdgeNetWithCategoriesJittable
 }
-
-import os
-do_jittable = bool(os.environ.get('HGCAL_JITTABLE', False))
-if do_jittable:
-  print('DOING JITTABLE STUFF')
-  from .EdgeNetWithCategories import EdgeNetWithCategoriesJittable
-  _models['EdgeNetWithCategoriesJittable'] = EdgeNetWithCategoriesJittable
-else:
-  print('Not doing jittable stuff')
 
 _losses = {'energy_fraction_loss': energy_fraction_loss,
 }
