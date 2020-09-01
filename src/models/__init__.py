@@ -5,7 +5,7 @@ Python module for holding our PyTorch models.
 from .EdgeNet import EdgeNet
 from .EdgeNet2 import EdgeNet2
 from .EdgeNetWithCategories import EdgeNetWithCategories, EdgeNetWithCategoriesJittable
-from .DynamicReductionNetwork import DynamicReductionNetwork
+from .DynamicReductionNetwork import DynamicReductionNetwork, DynamicReductionNetworkJittable
 from .gnn_geometric import GNNSegmentClassifier    
 from .GravNet import GravNet, energy_fraction_loss
 
@@ -15,6 +15,7 @@ _models = {'EdgeNetWithCategories': EdgeNetWithCategories,
            'heptrkx_segment_classifier': GNNSegmentClassifier,
            'GravNet': GravNet,
            'DynamicReductionNetwork': DynamicReductionNetwork,
+           'DynamicReductionNetworkJittable': DynamicReductionNetworkJittable,
            'EdgeNetWithCategoriesJittable' : EdgeNetWithCategoriesJittable
 }
 
